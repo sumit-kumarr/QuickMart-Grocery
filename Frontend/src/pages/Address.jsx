@@ -126,7 +126,7 @@ const Address = () => {
               type="text"
               placeholder="Enter Phone No"
             />
-            <button className="w-full mt-5 bg-accent-color text-white py-3 hover:bg-accent-hover transition-all duration-300 cursor-pointer uppercase rounded-lg shadow-custom hover:shadow-custom-lg">
+            <button className="w-full mt-5 bg-blue-500 text-white py-3 hover:bg-blue-600 transition-all duration-300 cursor-pointer uppercase rounded-lg shadow-custom hover:shadow-custom-lg">
               Save Address
             </button>
           </form>

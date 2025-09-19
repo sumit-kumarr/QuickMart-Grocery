@@ -67,7 +67,8 @@ export const placeOrderStripe = async (req, res) => {
 
     return res.json({ message: true, url:session.url });
   } catch (error) {
-    return res.json({ message: false, error: error.message });
+    console.log(error)
+     res.json({ message: false, error: error.message });
   }
 };
 
@@ -142,6 +143,7 @@ export const placeOrderCOD = async (req, res) => {
     return res.json({ message: true, message: "Order placed successfully" });
   } catch (error) {
     return res.json({ message: false, error: error.message });
+    console.log(error.message)
   }
 };
 

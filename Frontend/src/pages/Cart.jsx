@@ -41,8 +41,8 @@ const Cart = () => {
 
   const userAddress = React.useCallback(async () => {
     try {
-      // Backend expects POST /api/address/get with auth cookie; no body required
-      const { data } = await axios.get("/api/address/get");
+      // Backend expects POST /api/address/get with auth cookie; send empty JSON body
+      const { data } = await axios.post("/api/address/get", {});
       if (data.success) {
         setAddress(data.addresses);
         if (data.addresses.length > 0) {
@@ -61,9 +61,9 @@ const Cart = () => {
 
   const placeOrder = async () => {
     try {
-      // if (!selectAddress) {
-      //   return toast.error("Please select address");
-      // }
+      if (!selectAddress) {
+        return toast.error("Please select address");
+      }
       if (paymentOption === "COD") {
         const { data } = await axios.post("api/order/cod", {
           userId: user._id,

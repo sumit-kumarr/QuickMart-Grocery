@@ -4,13 +4,14 @@ import { Link, useParams } from "react-router-dom";
 import ProductCard from "../Components/ProductCard";
 import Loader from "../Components/Loader";
 const ProductDetails = () => {
-  const { products, navigate, currency, fetchCart, fetchProducts } = useAppContext();
+  const { products, navigate, currency, fetchCart, fetchProducts, axios } = useAppContext();
   const { id } = useParams();
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fallbackProduct, setFallbackProduct] = useState(null);
 
-  const product = products.find((item) => item._id === id);
+  const product = products.find((item) => item._id === id) || fallbackProduct;
 
   useEffect(() => {
     if (products.length > 0 && product) {
@@ -52,6 +53,25 @@ const ProductDetails = () => {
       setLoading(false);
     }
   }, [products, fetchProducts]);
+
+  // Fallback: if the product isn't in the list (e.g., filtered list or not yet cached), fetch by id
+  useEffect(() => {
+    const needFetch = products.length > 0 && !products.find((p) => p._id === id);
+    if (!needFetch) return;
+    let isMounted = true;
+    setLoading(true);
+    axios
+      .get('/api/product/id', { params: { id } })
+      .then(({ data }) => {
+        if (isMounted && data?.success && data?.product) {
+          setFallbackProduct(data.product);
+        }
+      })
+      .finally(() => isMounted && setLoading(false));
+    return () => {
+      isMounted = false;
+    };
+  }, [id, products, axios]);
 
   if (loading || products.length === 0) {
     return (
