@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import ProductCard from "../Components/ProductCard";
 import Loader from "../Components/Loader";
 const ProductDetails = () => {
-  const { products, navigate, currency, fetchCart } = useAppContext();
+  const { products, navigate, currency, fetchCart, fetchProducts } = useAppContext();
   const { id } = useParams();
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
@@ -43,14 +43,17 @@ const ProductDetails = () => {
     }
   }, [product]);
 
+  // Ensure products are available when landing directly on this page
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
+    if (!products || products.length === 0) {
+      setLoading(true);
+      fetchProducts()?.finally?.(() => setLoading(false));
+    } else {
       setLoading(false);
-    }, 2000);
-  }, []);
+    }
+  }, [products, fetchProducts]);
 
-  if (loading) {
+  if (loading || products.length === 0) {
     return (
       <div className="bg-primary min-h-screen flex items-center justify-center">
         <Loader />

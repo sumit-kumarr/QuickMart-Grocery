@@ -34,9 +34,10 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/products' element={<AllProducts/>}/>
         <Route path='/about' element={<About/>}/>
+        {/* Order matters: more specific product detail routes must come before the category route */}
+        <Route path='/products/:category/:id' element={<ProductDetails/>}/>
+        <Route path='/products/:id' element={<ProductDetails/>}/>
         <Route path="/products/:category" element={<ProductsCategory/>}/>
-  <Route path='/products/:category/:id' element={<ProductDetails/>}/>
-  <Route path='/products/:id' element={<ProductDetails/>}/>
         <Route path = "/cart" element={<Cart/>}></Route>
         <Route path='/*' element={<h1 className='text-3xl font-bold text-center mt-32 text-primary'>404 Page Not Found</h1>}/>
         <Route path ="/add-address" element={<Address/>}></Route>

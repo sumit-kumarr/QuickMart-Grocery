@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppContext } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 
@@ -8,7 +8,7 @@ const Cart = () => {
     products,
     currency,
     cartItems,
-    removeCartItems,
+    removeCartItem,
     getCartCount,
     getCartAmount,
     updateCartItem,
@@ -16,7 +16,7 @@ const Cart = () => {
     navigate,
     user,
     axios,
-  } = React.useContext(AppContext);
+  } = useAppContext()
   const [cartArray, setCartArray] = useState([]);
   const [showAddress, setShowAddress] = React.useState(false);
   const [address, setAddress] = React.useState([]);
@@ -41,7 +41,8 @@ const Cart = () => {
 
   const userAddress = React.useCallback(async () => {
     try {
-      const { data } = await axios.get("api/address/get");
+      // Backend expects POST /api/address/get with auth cookie; no body required
+      const { data } = await axios.get("/api/address/get");
       if (data.success) {
         setAddress(data.addresses);
         if (data.addresses.length > 0) {
@@ -60,9 +61,9 @@ const Cart = () => {
 
   const placeOrder = async () => {
     try {
-      if (!selectAddress) {
-        return toast.error("Please select address");
-      }
+      // if (!selectAddress) {
+      //   return toast.error("Please select address");
+      // }
       if (paymentOption === "COD") {
         const { data } = await axios.post("api/order/cod", {
           userId: user._id,
@@ -182,7 +183,7 @@ const Cart = () => {
               {product.offerPrice * product.quantity}
             </p>
             <button
-              onClick={() => removeCartItems(product._id)}
+              onClick={() => removeCartItem(product._id)}
               className="cursor-pointer mx-auto p-2 hover:bg-tertiary rounded-lg transition-colors"
             >
               <img
