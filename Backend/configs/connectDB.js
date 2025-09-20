@@ -6,9 +6,10 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+
 const envPath = join(__dirname, '..', '.env');
 console.log('Loading .env from:', envPath);
-dotenv.config({ path: envPath });
+dotenv.config({ path: envPath }); // DEBUG: Print all env variables
 
 const connectDB = async () => {
     try {

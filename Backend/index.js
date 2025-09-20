@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
 import connectDB from "./configs/connectDB.js";
-import "dotenv/config";
 import userRouter from "./routes/userRoute.js";
 import sellerRouter from "./routes/sellerRoute.js";
 import connectCloudinary from "./configs/cloudinary.js";
@@ -11,6 +10,7 @@ import cartRouter from "./routes/cartRoute.js";
 import addressRouter from "./routes/addressRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import { stripeWebhook } from "./controllers/orderController.js";
+import "dotenv/config";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,3 +45,4 @@ app.use("/api/order", orderRouter);
 app.listen(PORT, () => {
   console.log(`server is running on the Port ${PORT}`);
 });
+

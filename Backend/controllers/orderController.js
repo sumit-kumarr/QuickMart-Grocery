@@ -2,6 +2,7 @@ import Order from "../models/order.js";
 import Product from "../models/Product.js";
 import stripe from "stripe";
 import userModel from "../models/user.js";
+import mongoose from "mongoose";
 
 //stripe
 export const placeOrderStripe = async (req, res) => {
@@ -9,13 +10,13 @@ export const placeOrderStripe = async (req, res) => {
     const { userId, items, address } = req.body;
     const { origin } = req.headers;
     if (!address || items.length === 0) {
-      return res.json({ message: false, error: "Invalid data" });
+      return res.json({ success: false, error: "Invalid data" });
     }
 
-    let productData = {};
+    let productData = [];
 
     let amount = 0;
-    const product = await items.reduce(async (acceleratedValues, item) => {
+    amount = await items.reduce(async (acceleratedValues, item) => {
       const product = await Product.findById(item.product);
       productData.push({
         name: product.name,
@@ -24,15 +25,18 @@ export const placeOrderStripe = async (req, res) => {
       });
 
       return (await acceleratedValues) + product.offerPrice * item.quantity;
-    });
+    }, 0);
 
-    amount += Math.floor(amount * 0.02);
+    amount = amount + Math.floor(amount * 0.02);
 
     const order = await Order.create({
-      userId,
-      items,
+      userId: new mongoose.Types.ObjectId(userId),
+      items: items.map(item => ({
+        product: new mongoose.Types.ObjectId(item.product),
+        quantity: item.quantity
+      })),
       amount,
-      address,
+      address: new mongoose.Types.ObjectId(address),
       paymentType: "Online",
     });
 
@@ -57,18 +61,20 @@ export const placeOrderStripe = async (req, res) => {
     const session  = await stripeInstance.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-        line_items,
-        success_url: `${origin}/loader?next=my-orders`,
-        cancel_url: `${origin}/cart`,
-        metadata: { orderId: order._id.toString() },
-        userId,
+      line_items,
+      success_url: `${origin}/loader?next=my-orders`,
+      cancel_url: `${origin}/cart`,
+      metadata: { 
+        orderId: order._id.toString(),
+        userId: userId.toString()
+      },
     });
 
 
-    return res.json({ message: true, url:session.url });
+    return res.json({ success: true, url:session.url });
   } catch (error) {
     console.log(error)
-     res.json({ message: false, error: error.message });
+     res.json({ success: false, error: error.message });
   }
 };
 
@@ -84,24 +90,28 @@ export const stripeWebhook = async (req, res) => {
 
         
     } catch (error) {
+        console.log('Webhook signature verification failed:', error.message);
         return res.status(400).send(`Webhook Error: ${error.message}`);
-        
     }
 
     //handle the event
     switch (event.type) {
         case 'checkout.session.succeeded':{
-            const paymentIntent = event.data.object;
-            const paymentIntentId = paymentIntent.orderId;
-
-            //metadata
-            const session = await stripeInstance.checkout.sessions.listLineItems({
-                payment_intent: paymentIntentId,
-            })
-
-            const {orderId,userId} = session.data[0].metadata;
-            await Order.findByIdAndUpdate(orderId,{isPaid:true});
-            await userModel.findByIdAndUpdate(userId,{cartItems:{}});
+            const session = event.data.object;
+            const { orderId, userId } = session.metadata;
+            
+            if (!orderId || !userId) {
+                console.log('Missing orderId or userId in webhook metadata');
+                break;
+            }
+            
+            try {
+                await Order.findByIdAndUpdate(orderId, { isPaid: true });
+                await userModel.findByIdAndUpdate(userId, { cartItems: {} });
+                console.log(`Order ${orderId} marked as paid successfully`);
+            } catch (updateError) {
+                console.log(`Error updating order ${orderId}:`, updateError.message);
+            }
             break;
         }
 
@@ -112,7 +122,7 @@ export const stripeWebhook = async (req, res) => {
 
     }
 
-    response.json({received:true});
+    res.json({received:true});
 }
 
 
@@ -123,26 +133,33 @@ export const placeOrderCOD = async (req, res) => {
   try {
     const { userId, items, address } = req.body;
     if (!address || items.length === 0) {
-      return res.json({ message: false, error: "Invalid address or items" });
+      return res.json({ success: false, error: "Invalid address or items" });
     }
     let amount = 0;
-    const product = await items.reduce(async (acceleratedValues, item) => {
+    amount = await items.reduce(async (acceleratedValues, item) => {
       const product = await Product.findById(item.product);
       return (await acceleratedValues) + product.offerPrice * item.quantity;
-    });
+    }, 0);
 
-    amount += Math.floor(amount * 0.02);
+    amount = amount + Math.floor(amount * 0.02);
 
     await Order.create({
-      userId,
-      items,
+      userId: new mongoose.Types.ObjectId(userId),
+      items: items.map(item => ({
+        product: new mongoose.Types.ObjectId(item.product),
+        quantity: item.quantity
+      })),
       amount,
-      address,
+      address: new mongoose.Types.ObjectId(address),
       paymentType: "COD",
     });
-    return res.json({ message: true, message: "Order placed successfully" });
+    
+    // Clear cart after successful order
+    await userModel.findByIdAndUpdate(userId, { cartItems: {} });
+    
+    return res.json({ success: true, message: "Order placed successfully" });
   } catch (error) {
-    return res.json({ message: false, error: error.message });
+    return res.json({ success: false, error: error.message });
     console.log(error.message)
   }
 };
@@ -152,16 +169,24 @@ export const placeOrderCOD = async (req, res) => {
 export const getUserOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-    const order = await Order.find({
-      userId,
+    console.log("getUserOrders - userId:", userId); // Debug log
+    
+    if (!userId) {
+      return res.json({ success: false, error: "User ID not found" });
+    }
+    
+    const orders = await Order.find({
+      userId: new mongoose.Types.ObjectId(userId),
       $or: [{ paymentType: "COD" }, { isPaid: true }],
     })
-      .populate("items.product address")
+      .populate("items.product address userId")
       .sort({ createdAt: -1 });
 
-    res.json({ message: true, order });
+    console.log("Found orders:", orders.length); // Debug log
+    res.json({ success: true, order: orders });
   } catch (error) {
-    res.json({ message: false, error: error.message });
+    console.log("getUserOrders error:", error.message); // Debug log
+    res.json({ success: false, error: error.message });
   }
 };
 
@@ -172,10 +197,10 @@ export const getAllOrders = async (req, res) => {
     const orders = await Order.find({
       $or: [{ paymentType: "COD" }, { isPaid: true }],
     })
-      .populate("items.product address")
+      .populate("items.product address userId")
       .sort({ createdAt: -1 });
-    res.json({ message: true, orders });
+    res.json({ success: true, orders });
   } catch (error) {
-    res.json({ message: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 };

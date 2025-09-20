@@ -65,13 +65,13 @@ const Cart = () => {
         return toast.error("Please select address");
       }
       if (paymentOption === "COD") {
-        const { data } = await axios.post("api/order/cod", {
+        const { data } = await axios.post("/api/order/cod", {
           userId: user._id,
           items: cartArray.map((item) => ({
             product: item._id,
             quantity: item.quantity,
-            address: selectAddress._id,
           })),
+          address: selectAddress._id,
         });
         if (data.success) {
           toast.success(data.message);
@@ -79,21 +79,21 @@ const Cart = () => {
           navigate("/my-orders");
           scrollTo(0, 0);
         } else {
-          toast.error(data.message);
+          toast.error(data.error);
         }
       } else {
-        const { data } = await axios.post("api/order/stripe", {
+        const { data } = await axios.post("/api/order/stripe", {
           userId: user._id,
           items: cartArray.map((item) => ({
             product: item._id,
             quantity: item.quantity,
-            address: selectAddress._id,
           })),
+          address: selectAddress._id,
         });
         if (data.success) {
         window.location.replace(data.url);
         } else {
-          toast.error(data.message);
+          toast.error(data.error);
         }
       }
     } catch (error) {

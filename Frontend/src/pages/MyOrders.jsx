@@ -4,25 +4,81 @@ import { dummyOrders } from "../assets/assets";
 
 const MyOrders = () => {
   const [orders, setOrders] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
   const { currency, axios, user } = useAppContext();
 
   const fetchOrders = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const { data } = await axios.get("/api/order/user");
+      console.log("Orders API Response:", data); // Debug log
       if (data.success) {
-        setOrders(data.orders);
+        setOrders(data.order || []); // Ensure it's an array
+      } else {
+        console.log("API Error:", data.error);
+        setError(data.error || "Failed to fetch orders");
+        setOrders([]); // Set empty array on error
       }
     } catch (error) {
-      console.log(error);
+      console.log("Fetch Orders Error:", error);
+      setError(error.response?.data?.error || error.message || "Failed to fetch orders");
+      setOrders([]); // Set empty array on error
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (user) {
       fetchOrders();
+    } else {
+      setLoading(false);
+      setOrders([]);
+      setError(null);
     }
   }, [user]);
+
+  if (loading) {
+    return (
+      <div className="mt-8 pb-15 bg-primary min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-primary mb-4">My Orders</div>
+          <div className="text-text-muted">Loading your orders...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-8 pb-15 bg-primary min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-primary mb-4">My Orders</div>
+          <div className="text-red-500 mb-4">Error: {error}</div>
+          <button 
+            onClick={fetchOrders}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="mt-8 pb-15 bg-primary min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-primary mb-4">My Orders</div>
+          <div className="text-text-muted">Please log in to view your orders</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8 pb-15 bg-primary min-h-screen">
@@ -31,7 +87,13 @@ const MyOrders = () => {
         <div className="w-16 h-0.5 bg-accent-color rounded-full"></div>
       </div>
 
-      {orders.map((order, index) => (
+      {orders.length === 0 ? (
+        <div className="text-center mt-8">
+          <div className="text-text-muted text-lg">No orders found</div>
+          <div className="text-text-muted">Your orders will appear here once you place them</div>
+        </div>
+      ) : (
+        orders.map((order, index) => (
         <div
           key={index}
           className="border border-blue-400 rounded-lg mb-10 p-5 py-5 max-w-4xl bg-secondary shadow-custom"
@@ -80,7 +142,8 @@ const MyOrders = () => {
             </div>
           ))}
         </div>
-      ))}
+        ))
+      )}
     </div>
   );
 };
