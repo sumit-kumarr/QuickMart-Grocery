@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install": "node index.js",
-    "dev":"npm run dev"
+    "dev": "nodemon Backend/index.js",
+    "build":"npm install  && npm install --prefix Frontend && npm run build --prefix Frontend",
+    "start":"node Backend/index.js"
   },
   "keywords": [],
   "author": "",

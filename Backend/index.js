@@ -11,15 +11,24 @@ import addressRouter from "./routes/addressRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import { stripeWebhook } from "./controllers/orderController.js";
 import "dotenv/config";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const __dirname = path.resolve();
+
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = ["http://localhost:5173"];
-app.post('/stripe' ,express.raw({type:'application/json'}),stripeWebhook);
+// configure your allowed origins
+const allowedOrigins = "";
+
+app.post(
+  "/stripe",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
+);
 
 app.use(
   cors({
@@ -28,13 +37,16 @@ app.use(
   })
 );
 
+// connect to services
 await connectDB();
 await connectCloudinary();
 
+// sample route
 app.get("/", (req, res) => {
   res.send("Hello From Server");
 });
 
+// API routes
 app.use("/api/user", userRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/product", productRouter);
@@ -42,7 +54,15 @@ app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/order", orderRouter);
 
-app.listen(PORT, () => {
-  console.log(`server is running on the Port ${PORT}`);
+// serve frontend build
+app.use(express.static(path.join(__dirname, "Frontend", "dist")));
+
+// ✅ SPA fallback: use regex OR a catch-all middleware
+app.get(/.*/, (_, res) => {
+  res.sendFile(path.resolve(__dirname, "Frontend", "dist", "index.html"));
 });
 
+// start server
+app.listen(PORT, () => {
+  console.log(`server is running on Port ${PORT}`);
+});
