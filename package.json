@@ -7,7 +7,7 @@
     "dev": "nodemon Backend/index.js",
     "build": "npm install  && npm install --prefix Frontend && npm run build --prefix Frontend",
     "start": "node Backend/index.js",
-    "vercel-build": "npm install && npm run build"
+    "vercel-build": "npm run start && npm run build"
   },
   "keywords": [],
   "author": "",
