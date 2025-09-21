@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
+   
   },
   "dependencies": {
     "@coreui/coreui": "^5.4.3",
