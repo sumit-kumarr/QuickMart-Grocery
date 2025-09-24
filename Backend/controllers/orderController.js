@@ -168,20 +168,17 @@ export const placeOrderCOD = async (req, res) => {
 
 export const getUserOrders = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user?._id;
     console.log("getUserOrders - userId:", userId); // Debug log
-    
     if (!userId) {
       return res.json({ success: false, error: "User ID not found" });
     }
-    
     const orders = await Order.find({
       userId: new mongoose.Types.ObjectId(userId),
       $or: [{ paymentType: "COD" }, { isPaid: true }],
     })
       .populate("items.product address userId")
       .sort({ createdAt: -1 });
-
     console.log("Found orders:", orders.length); // Debug log
     res.json({ success: true, order: orders });
   } catch (error) {

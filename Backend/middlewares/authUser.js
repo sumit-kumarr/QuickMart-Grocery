@@ -13,8 +13,8 @@ import jwt from "jsonwebtoken";
     console.log("authUser - decoded token:", tokenDecode); // Debug log
     
     if (tokenDecode.id) {
-      req.body.userId = tokenDecode.id;
-      console.log("authUser - userId set:", tokenDecode.id); // Debug log
+      req.user = { _id: tokenDecode.id };
+      console.log("authUser - req.user set:", req.user); // Debug log
     } else {
       return res.json({ success: false, message: "Not Authorized" });
     }

@@ -18,7 +18,7 @@ const MyOrders = () => {
       if (data.success) {
         setOrders(data.order || []); // Ensure it's an array
       } else {
-        console.log("API Error:", data.error);
+        
         setError(data.error || "Failed to fetch orders");
         setOrders([]); // Set empty array on error
       }
