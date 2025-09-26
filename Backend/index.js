@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // configure your allowed origins
-const allowedOrigins = "http://localhost:5173";
+const allowedOrigins = "https://quick-mart-grocery.vercel.app";
 
 app.post(
   "/stripe",
