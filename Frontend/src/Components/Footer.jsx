@@ -64,9 +64,6 @@ const Footer = () => {
             <li>
               <Link to = "/products" className="hover:text-blue-500 transition-colors">Products</Link>
             </li>
-            {/* <li>
-              <Link to = "/seller" className="hover:text-blue-500 transition-colors">Become A Seller</Link>
-            </li> */}
             <li>
               <Link to = "/my-orders" className="hover:text-blue-500 transition-colors">My Orders</Link>
             </li>
