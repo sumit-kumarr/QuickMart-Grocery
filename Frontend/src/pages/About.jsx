@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const About = () => {
   return (
@@ -18,7 +19,7 @@ const About = () => {
           convenience, and customer service.
         </p>
 
-        <p className="text-lg text-justify text-primary">
+        <p className="text-lg text-justify text-black">
           Founded in 2025, QuickMart has come a long way from its beginnings.
           When we first started out, our passion for convenient and reliable
           grocery shopping drove us to start our own business.
@@ -28,9 +29,11 @@ const About = () => {
         <img src="bannerr.png" alt="banner" className="max-w-2/3 rounded-3xl" />
         <div className="absolute flex flex-col top-1/3 left-30 transform items-start gap-3">
           <span className="text-2xl md:text-2xl sm:text-sm text-white drop-shadow-lg">your number one <br />source for all things <br /> grocery</span>
-          <button className="bg-white bg-opacity-80 hover:bg-opacity-100 p-4 rounded-lg text-primary font-medium transition-all duration-300 shadow-custom hover:shadow-custom-lg">
+          <Link to = "/products">
+          <button className="bg-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300 hover:scale-105 drop-shadow-lg border border-blue">
             Shop Now
           </button>
+          </Link>
         </div>
       </div>
     </div>
