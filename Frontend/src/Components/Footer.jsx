@@ -65,13 +65,16 @@ const Footer = () => {
               <Link to = "/products" className="hover:text-blue-500 transition-colors">Products</Link>
             </li>
             <li>
-              <Link to = "/seller" className="hover:text-blue-500 transition-colors">Become A Seller</Link>
+              <a href="#" className="hover:text-accent-color transition-colors">Safety Information</a>
             </li>
             <li>
-              <Link to = "/my-orders" className="hover:text-blue-500 transition-colors">My Orders</Link>
+              <a href="#" className="hover:text-accent-color transition-colors">Cancellation Options</a>
             </li>
             <li>
-              <Link to = "/cart" className="hover:text-blue-500 transition-colors">cart</Link>
+              <a href="#" className="hover:text-accent-color transition-colors">Contact Us</a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-accent-color transition-colors">Accessibility</a>
             </li>
           </ul>
         </div>
