@@ -23,20 +23,20 @@ const ProductCard = ({ product }) => {
         }
         style={{ textDecoration: "none", color: "inherit" }}
       >
-        <div className="border border-blue-300 rounded-xl md:px-4 px-3 py-4 bg-primary min-w-56 max-w-56 w-full shadow-custom hover:shadow-custom-lg transition-all duration-300 group">
-          <div className="group cursor-pointer flex items-center justify-center px-2 mb-3">
+        <div className="border border-blue-300 rounded-xl px-2 py-3 bg-primary w-full max-w-[170px] sm:max-w-56 shadow-custom hover:shadow-custom-lg transition-all duration-300 group flex flex-col justify-between h-full mx-auto">
+          <div className="group cursor-pointer flex items-center justify-center px-0 sm:px-2 mb-2 sm:mb-3">
             <img
-              className="group-hover:scale-110 transition-all duration-300 max-w-26 md:max-w-36"
+              className="group-hover:scale-110 transition-all duration-300 w-[60px] h-[60px] sm:w-[104px] sm:h-[104px] object-contain"
               src={Array.isArray(product.image) ? product.image[0] : product.image}
               alt={product.name}
             />
           </div>
-          <div className="text-text-muted text-sm">
-            <p className="text-accent-color font-medium">{product.category}</p>
-            <p className="text-primary font-semibold text-lg truncate w-full mt-1">
+          <div className="text-text-muted text-xs sm:text-sm flex flex-col gap-0.5">
+            <p className="text-accent-color font-medium leading-tight">{product.category}</p>
+            <p className="text-primary font-semibold text-sm sm:text-lg truncate w-full mt-0.5 leading-tight">
               {product.name}
             </p>
-            <div className="flex items-center gap-0.5 mt-2">
+            <div className="flex items-center gap-1 mt-1 sm:mt-2">
               {Array(5)
                 .fill("")
                 .map((_, i) => (
@@ -44,39 +44,38 @@ const ProductCard = ({ product }) => {
                     key={i}
                     src={i < 4 ? assets.star_icon : assets.star_dull_icon}
                     alt=""
-                    className="w-4 h-4"
+                    className="w-3 h-3 sm:w-4 sm:h-4"
                   />
                 ))}
-              <p className="text-text-muted text-xs ml-1">(3)</p>
+              <p className="text-text-muted text-[10px] sm:text-xs ml-1">(3)</p>
             </div>
-            <div className="flex items-end justify-between mt-4">
+            <div className="flex items-end justify-between mt-2 sm:mt-4">
               <div>
-                <p className="md:text-xl text-base font-bold text-accent-color">
+                <p className="text-sm sm:text-xl font-bold text-accent-color leading-tight">
                   {currency} {product.offerPrice}
                 </p>
-                <span className="text-text-muted md:text-sm text-xs line-through">
+                <span className="text-text-muted text-xs sm:text-sm line-through">
                   {currency}{product.price}
                 </span>
               </div>
               <div onClick={(e) => {e.stopPropagation();}} className="text-accent-color">
                 {!cartItems[product._id] ? (
                   <button
-                    className="flex items-center justify-center gap-1 bg-blue-400 hover:bg-blue-500 text-white border-0 md:w-[80px] w-[64px] h-[34px] rounded-lg font-medium cursor-pointer transition-all duration-300 shadow-custom hover:shadow-custom-lg"
+                    className="flex items-center justify-center gap-1 bg-blue-400 hover:bg-blue-500 text-white border-0 w-[48px] sm:w-[64px] md:w-[80px] h-[28px] sm:h-[34px] rounded-lg font-medium cursor-pointer transition-all duration-300 shadow-custom hover:shadow-custom-lg text-xs sm:text-sm"
                     onClick={(e) => {e.preventDefault(); fetchCart(product._id);}}
                   >
-                    {/* <img src={assets.cart_icon} alt="cart-icon" className="w-4 h-4 text-white" /> */}
                     <IoMdCart className="w-4 h-4 text-white" />
-                    Add
+                    <span className="hidden sm:inline">Add</span>
                   </button>
                 ) : (
-                  <div className="flex items-center justify-center gap-2 md:w-20 w-16 h-[34px] bg-tertiary rounded-lg select-none border border-custom">
+                  <div className="flex items-center justify-center gap-1 w-[48px] sm:w-16 md:w-20 h-[28px] sm:h-[34px] bg-tertiary rounded-lg select-none border border-custom">
                     <button
                       onClick={(e) => {e.preventDefault(); removeCartItem(product._id);}}
                       className="cursor-pointer text-md px-2 h-full hover:text-blue-500 rounded-l-lg transition-all duration-200"
                     >
                       -
                     </button>
-                    <span className="w-5 text-center text-primary font-medium">
+                    <span className="w-4 sm:w-5 text-center text-primary font-medium">
                       {cartItems[product._id]}
                     </span>
                     <button

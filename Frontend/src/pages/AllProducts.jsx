@@ -39,7 +39,7 @@ setLoading(true);
         <p className="text-2xl underline font-bold uppercase text-primary">All Products</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-5 lg:grid-cols-5 mt-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 sm:gap-10 md:gap-5 lg:grid-cols-5 mt-5">
         {filerProducts
           .filter((product) => product.inStock)
           .map((product, index) => (
