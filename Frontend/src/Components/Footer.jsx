@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 const Footer = () => {
   return (
     <div className="text-text-muted pt-8 px-6 md:px-16 lg:px-24 xl:px-32 mt-20 bg-secondary">
@@ -40,7 +40,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <p className="text-lg text-primary font-semibold">QuickMart</p>
+          <p className="text-lg text-primary font-semibold">Support</p>
           <ul className="mt-3 flex flex-col gap-2 text-sm">
             <NavLink to="/about" className="hover:text-accent-color transition-colors">About</NavLink>
             <li>
@@ -59,22 +59,19 @@ const Footer = () => {
         </div>
 
         <div>
-          <p className="text-lg text-primary font-semibold">SUPPORT</p>
+          <p className="text-lg text-primary font-semibold">Quick Mart</p>
           <ul className="mt-3 flex flex-col gap-2 text-sm">
             <li>
-              <a href="#" className="hover:text-accent-color transition-colors">Help Center</a>
+              <Link to = "/products" className="hover:text-blue-500 transition-colors">Products</Link>
             </li>
             <li>
-              <a href="#" className="hover:text-accent-color transition-colors">Safety Information</a>
+              <Link to = "/seller" className="hover:text-blue-500 transition-colors">Become A Seller</Link>
             </li>
             <li>
-              <a href="#" className="hover:text-accent-color transition-colors">Cancellation Options</a>
+              <Link to = "/my-orders" className="hover:text-blue-500 transition-colors">My Orders</Link>
             </li>
             <li>
-              <a href="#" className="hover:text-accent-color transition-colors">Contact Us</a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-accent-color transition-colors">Accessibility</a>
+              <Link to = "/cart" className="hover:text-blue-500 transition-colors">cart</Link>
             </li>
           </ul>
         </div>
@@ -121,13 +118,13 @@ const Footer = () => {
         </p>
         <ul className="flex items-center gap-4">
           <li>
-            <a href="#" className="hover:text-accent-color transition-colors">Privacy</a>
+            <Link to="/about" className="hover:text-blue-500 transition-colors">About</Link>
           </li>
           <li>
-            <a href="#" className="hover:text-accent-color transition-colors">Terms</a>
+            <a href="/" className="hover:text-accent-color transition-colors">Terms</a>
           </li>
           <li>
-            <a href="#" className="hover:text-accent-color transition-colors">Sitemap</a>
+            <a href="/" className="hover:text-accent-color transition-colors">Sitemap</a>
           </li>
         </ul>
       </div>
