@@ -16,7 +16,15 @@ export const AppContextProvider = ({ children }) => {
   const [isSeller, setIsSeller] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [products, setProducts] = useState([]);
-  const [cartItems, setCartItems] = useState({});
+  // Initialize cartItems from localStorage if available
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const stored = localStorage.getItem('cartItems');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
   const [searchQuery, setSearchQuery] = useState({});
 
   //fetchsellerStatus
@@ -37,23 +45,36 @@ export const AppContextProvider = ({ children }) => {
     }
   }
 
-  const fetchUser = async()=>{
+  const fetchUser = async () => {
     try {
-      const {data} = await axios.get('/api/user/is-auth')
-      if(data.success){
-        setUser(data.user)
-        setCartItems(data.user.cartItems)
+      const { data } = await axios.get('/api/user/is-auth');
+      if (data.success) {
+        setUser(data.user);
+        // Merge localStorage cart with DB cart if localStorage cart exists
+        const localCart = localStorage.getItem('cartItems');
+        let mergedCart = { ...data.user.cartItems };
+        if (localCart) {
+          const parsedLocal = JSON.parse(localCart);
+          for (const key in parsedLocal) {
+            if (mergedCart[key]) {
+              mergedCart[key] += parsedLocal[key];
+            } else {
+              mergedCart[key] = parsedLocal[key];
+            }
+          }
+          // Update DB with merged cart
+          await axios.post('/api/cart/update', { userId: data.user._id, cartItems: mergedCart });
+          localStorage.removeItem('cartItems');
+        }
+        setCartItems(mergedCart);
+      } else {
+        setUser(null);
       }
-      else{
-        setUser(null)
-      }
-      
     } catch (error) {
-      setUser(null)
+      setUser(null);
       console.log(error);
-      
     }
-  }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -123,29 +144,35 @@ export const AppContextProvider = ({ children }) => {
   };
   React.useEffect(() => {
     fetchProducts();
-    fetchSeller()
-    fetchUser()
+    fetchSeller();
+    fetchUser();
   }, []);
 
-  //cartItems localStorage
-  React.useEffect(()=>{
-    const updateCart = async()=>{
-      try{
-        const {data} = await axios.post('/api/cart/update',{cartItems})
-        if(!data.success){
-          toast.error(data.message)
+  // Sync cartItems to localStorage on every change
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch {}
+  }, [cartItems]);
+
+  // Sync cartItems to backend if user is logged in
+  React.useEffect(() => {
+    const updateCart = async () => {
+      try {
+        if (user && user._id) {
+          const { data } = await axios.post('/api/cart/update', { userId: user._id, cartItems });
+          if (!data.success) {
+            toast.error(data.message);
+          }
         }
-      }catch(error){
-        toast.error(error.message)
-
+      } catch (error) {
+        toast.error(error.message);
       }
+    };
+    if (user && user._id) {
+      updateCart();
     }
-
-    if(user){
-      updateCart()
-    }
-
-  },[cartItems])
+  }, [cartItems, user]);
 
   const value = {
     navigate,
