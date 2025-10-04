@@ -15,7 +15,10 @@ const Login = () => {
         name,
         email,
         password,
-      });
+      },
+      { withCredentials: true }
+      
+    );
 
       if (data && data.success) {
         navigate("/");
